@@ -1,17 +1,18 @@
-package countries
+package users
 
 import (
 	"../utils"
+	"database/sql"
 	"log"
 )
 
 type Country struct {
-	IsoAlphaCode string,
-	Name string
+	IsoAlphaCode string
+	Name         string
 }
 
 func (c *Country) IsValidCountry() bool {
-	if len(u.Country) != 3 {
+	if len(c.IsoAlphaCode) != 3 {
 		log.Println("Wrong lenght for the User.Country code. It should be equals to 3 characters.")
 
 		return false
@@ -24,13 +25,13 @@ func (c *Country) IsValidCountry() bool {
 
 	var country Country
 
-	err := roq.Scan(&country.IsoAlphaCode, &country.Name)
+	err := row.Scan(&country.IsoAlphaCode, &country.Name)
 
 	switch err {
 	case sql.ErrNoRows:
 		log.Println("This country does not exist in the database")
 		return false
-	case nil:
-		return true
 	}
+
+	return true
 }

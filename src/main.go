@@ -12,8 +12,8 @@ import (
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/user", users.CreateUser).Methods("POST")
-	router.HandleFunc("/user/{id}", users.UpdateUser).Methods("PUT")
+	router.HandleFunc("/user", users.PostUser).Methods("POST")
+	router.HandleFunc("/user/{id}", users.PutUser).Methods("PUT")
 	router.HandleFunc("/user/{id}", users.DeleteUser).Methods("DELETE")
 	router.HandleFunc("/user/{id}", users.GetUser).Methods("GET")
 	router.HandleFunc("/users", users.GetUsers).Methods("GET")

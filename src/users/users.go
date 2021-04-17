@@ -6,12 +6,12 @@ import (
 )
 
 type User struct {
-	Firstname string `json:"firstname,omitempty"`,
-	Lastname string `json:"lastname,omitempty"`,
-	Nickname string `json:"nickname,omitempty"`,
-	Password string `json:"password"`,
-	Email string `json:"email,omitempty"`,
-	Country string `json:"country,omitempty"`,
+	Firstname string `json:"firstname,omitempty"`
+	Lastname  string `json:"lastname,omitempty"`
+	Nickname  string `json:"nickname,omitempty"`
+	Password  string `json:"password"`
+	Email     string `json:"email,omitempty"`
+	Country   string `json:"country,omitempty"`
 }
 
 func (u *User) IsValidNickname() bool {

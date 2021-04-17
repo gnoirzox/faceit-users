@@ -2,10 +2,12 @@ package utils
 
 import (
 	"database/sql"
+	"encoding/json"
+	"fmt"
 	_ "github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
-
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -18,9 +20,9 @@ func getEnv(key string, defaultValue string) string {
 }
 
 func OpenDBConnection() *sql.DB {
-	const (
+	var (
 		host     = getEnv("DB_HOST", "localhost")
-		port     = getEnv("DB_PORT", 5438)
+		port     = getEnv("DB_PORT", "5438")
 		user     = getEnv("DB_USER", "postgres")
 		password = getEnv("DB_PASS", "postgres")
 		dbname   = getEnv("DB_NAME", "postgres")

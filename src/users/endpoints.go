@@ -18,12 +18,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	if Id, ok := vars["id"]; ok {
 		userId = string(Id)
 	} else {
-		log.Println(err.Error())
-
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusBadRequest,
-			map[string]string{"error": "The provided user id is not valid."}
+			map[string]string{"error": "The provided user id is not valid."},
 		)
 
 		return
@@ -37,7 +35,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusNotFound,
-			map[string]string{"error": "The user does not exist."}
+			map[string]string{"error": "The user does not exist."},
 		)
 
 		return
@@ -48,7 +46,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	filters :=  make(map[string]string)
+	filters := make(map[string]string)
 
 	if nickname, ok := vars["nickname"]; ok {
 		filters["nickname"] = nickname
@@ -73,7 +71,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusNotFound,
-			map[string]string{"error": "The given filters don't seem valid."}
+			map[string]string{"error": "The given filters don't seem valid."},
 		)
 
 		return
@@ -82,42 +80,26 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	utils.ReturnJsonResponse(w, http.StatusOK, users)
 }
 
-func ValidateUser(user *User) bool {
-	if !&u.IsValidNickname() {
-		utils.ReturnJsonResponse(
-			w, 
-			http.StatusBadRequest,
-			map[string]string{
-				"error": "The submitted nickname is not valid. It should have a length between 3 and 12 characters."
-			}
-		)
+func ValidateUser(u *User) (bool, string) {
+	if u.IsValidNickname() != true {
+		errorMessage := "The submitted nickname is not valid. It should have a length between 3 and 12 characters."
 
-		return false
+		return false, errorMessage
 	}
 
-	if !&u.IsValidPassword() {
-		utils.ReturnJsonResponse(
-			w, 
-			http.StatusBadRequest,
-			map[string]string{
-				"error": "The submitted password is not valid. It should have a length of at least 8 characters."
-			}
-		)
+	if u.IsValidPassword() != true {
+		errorMessage := "The submitted password is not valid. It should have a length of at least 8 characters."
 
-		return false
+		return false, errorMessage
 	}
 
-	if !&u.IsValidEmail() {
-		utils.ReturnJsonResponse(
-			w, 
-			http.StatusBadRequest,
-			map[string]string{"error": "The submitted Email is not valid."}
-		)
+	if u.IsValidEmail() != true {
+		errorMessage := "The submitted Email is not valid."
 
-		return false
+		return false, errorMessage
 	}
 
-	return true
+	return true, ""
 }
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
@@ -132,15 +114,24 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 
 		utils.ReturnJsonResponse(
-			w, 
-			http.StatusBadRequest, 
-			map[string]string{"error": "Invalid resquest payload"}
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Invalid resquest payload"},
 		)
 
 		return
 	}
 
-	if !ValidateUser(&u) {
+	_, validationError := ValidateUser(&u)
+
+	if validationError != "" {
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{
+				"error": validationError,
+			},
+		)
 		return
 	}
 
@@ -150,18 +141,18 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		log.Println(err.Error())
 
 		utils.ReturnJsonResponse(
-			w, 
-			http.StatusInternalServerError, 
-			map[string]string{"status": "Unexpected error"}
+			w,
+			http.StatusInternalServerError,
+			map[string]string{"status": "Unexpected error"},
 		)
 
 		return
 	}
 
 	utils.ReturnJsonResponse(
-		w, 
-		http.StatusOK, 
-		map[string]string{"status": "The user has successfully been created"}
+		w,
+		http.StatusOK,
+		map[string]string{"status": "The user has successfully been created"},
 	)
 }
 
@@ -173,12 +164,10 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 	if Id, ok := vars["id"]; ok {
 		userId = string(Id)
 	} else {
-		log.Println(err.Error())
-
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusBadRequest,
-			map[string]string{"error": "The provided user id is not valid."}
+			map[string]string{"error": "The provided user id is not valid."},
 		)
 
 		return
@@ -191,40 +180,48 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 
 	defer r.Body.Close()
 
-	if err != nil {
-		log.Println(err.Error())
-
+	if decodeErr != nil {
+		log.Println(decodeErr.Error())
 		utils.ReturnJsonResponse(
-			w, 
-			http.StatusBadRequest, 
-			map[string]string{"error": "Invalid resquest payload"}
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Invalid resquest payload"},
 		)
 
 		return
 	}
 
-	if !ValidateUser(&user) {
+	_, validationError := ValidateUser(&user)
+
+	if validationError != "" {
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{
+				"error": validationError,
+			},
+		)
 		return
 	}
 
-	err = UpdateUser(&user)
+	err := UpdateUser(userId, &user)
 
 	if err != nil {
 		log.Println(err.Error())
 
 		utils.ReturnJsonResponse(
-			w, 
-			http.StatusInternalServerError, 
-			map[string]string{"status": "Unexpected error"}
+			w,
+			http.StatusInternalServerError,
+			map[string]string{"status": "Unexpected error"},
 		)
 
 		return
 	}
 
 	utils.ReturnJsonResponse(
-		w, 
-		http.StatusOK, 
-		map[string]string{"status": "The user has successfully been updated"}
+		w,
+		http.StatusOK,
+		map[string]string{"status": "The user has successfully been updated"},
 	)
 }
 
@@ -236,18 +233,16 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	if Id, ok := vars["id"]; ok {
 		userId = string(Id)
 	} else {
-		log.Println(err.Error())
-
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusBadRequest,
-			map[string]string{"error": "The provided user id is not valid or not given."}
+			map[string]string{"error": "The provided user id is not valid or not given."},
 		)
 
 		return
 	}
 
-	user, err := RemoveUser(userId)
+	err := RemoveUser(userId)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -255,7 +250,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusNotFound,
-			map[string]string{"error": "The user does not exist."}
+			map[string]string{"error": "The user does not exist."},
 		)
 
 		return
@@ -264,6 +259,6 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	utils.ReturnJsonResponse(
 		w,
 		http.StatusOK,
-		map[string]string{"status": "The provided user has been successfully deleted."}
+		map[string]string{"status": "The provided user has been successfully deleted."},
 	)
 }

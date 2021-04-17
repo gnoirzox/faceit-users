@@ -2,7 +2,7 @@ package users
 
 import (
 	"container/list"
-	"database/sql"
+	"errors"
 	"log"
 
 	"../utils"
@@ -10,7 +10,7 @@ import (
 
 func RetrieveUser(UserId string) (*User, error) {
 	db := utils.OpenDBConnection()
-	defer db.close()
+	defer db.Close()
 
 	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country FROM users WHERE _id = ?", UserId)
 
@@ -24,30 +24,30 @@ func RetrieveUser(UserId string) (*User, error) {
 		return nil, err
 	}
 
-	return user, nil
+	return &user, nil
 }
 
-func RetrieveUsers(filters map[string]string) (*List, error) {
+func RetrieveUsers(filters map[string]string) (*list.List, error) {
 	db := utils.OpenDBConnection()
-	defer db.close()
+	defer db.Close()
 
 	where := "WHERE 1=1"
 
-	if nickname, ok := filter["nickname"]; ok  {
+	if nickname, ok := filters["nickname"]; ok {
 		where += " AND nickname = " + nickname
 	}
 
-	if email, ok := filter["email"]; ok {
+	if email, ok := filters["email"]; ok {
 		where += " AND email = " + email
 	}
 
-	if country, ok := filter["country"]; ok {
+	if country, ok := filters["country"]; ok {
 		where += " AND country = " + country
 	}
 
 	queryString := "SELECT firstname, lastname, nickname, email, country FROM users " + where
 
-	rows, err := db.QueryRow(queryString)
+	rows, err := db.Query(queryString)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -61,11 +61,11 @@ func RetrieveUsers(filters map[string]string) (*List, error) {
 		var user User
 
 		err := rows.Scan(
-			&user.Firstname, 
-			&user.Lastname, 
+			&user.Firstname,
+			&user.Lastname,
 			&user.Nickname,
 			&user.Email,
-			&user.Country
+			&user.Country,
 		)
 
 		if err != nil {
@@ -85,7 +85,7 @@ func InsertUser(user *User) error {
 	defer db.Close()
 
 	insert, err := db.Prepare(
-		"INSERT INTO users (firstname, lastname, nickname, password, email, country) VALUES (?, ?, ?, ?, ?, ?)"
+		"INSERT INTO users (firstname, lastname, nickname, password, email, country) VALUES (?, ?, ?, ?, ?, ?)",
 	)
 	defer insert.Close()
 
@@ -93,15 +93,23 @@ func InsertUser(user *User) error {
 		log.Println(err.Error())
 
 		return err
-	received
+	}
+
+	hashedPassword, hashedPasswordError := utils.HashPassword(user.Password)
+
+	if hashedPasswordError != nil {
+		log.Println(hashedPasswordError.Error())
+
+		return err
+	}
 
 	_, err = insert.Exec(
-		&user.Firstname, 
-		&user.Lastname, 
-		&user.Nickname, 
-		utils.HashPassword(&user.Password), 
-		&user.Email, 
-		&user.Country
+		&user.Firstname,
+		&user.Lastname,
+		&user.Nickname,
+		hashedPassword,
+		&user.Email,
+		&user.Country,
 	)
 
 	if err != nil {
@@ -125,28 +133,30 @@ func UpdateUser(userId string, user *User) error {
 		return err
 	}
 
-	var user *User
-
 	if userId != "" {
-		user, err := RetrieveUser(userId)
+		_, err := RetrieveUser(userId)
 
 		if err != nil {
 			return err
 		}
 	} else {
-		err := "No UserId provided, a user_id is mandatory to update a given user."
+		err := errors.New("No UserId provided, a user_id is mandatory to update a given user.")
 
-		log.Println(err)
+		log.Println(err.Error())
 
-		return nil, err
+		return err
 	}
 
 	update, err := transaction.Prepare(
-		"UPDATE users SET firstname = ?, lastname = ?, nickname = ?, password = ?, email = ?, country = ? WHERE _id = ?"
-	if err , err loerr {
-		users(err.Error())
-
+		"UPDATE users SET firstname = ?, lastname = ?, nickname = ?, password = ?, email = ?, country = ? WHERE _id = ?",
 	)
+
+	if err != nil {
+		log.Println(err.Error())
+
+		return err
+	}
+
 	defer update.Close()
 
 	if err != nil {
@@ -155,14 +165,22 @@ func UpdateUser(userId string, user *User) error {
 		return err
 	}
 
+	hashedPassword, hashedPasswordError := utils.HashPassword(user.Password)
+
+	if hashedPasswordError != nil {
+		log.Println(hashedPasswordError.Error())
+
+		return err
+	}
+
 	_, err = update.Exec(
-		&user.Firstname, 
-		&user.Lastname, 
-		&user.Nickname, 
-		utils.HashPassword(&user.Password), 
-		&user.Email, 
+		&user.Firstname,
+		&user.Lastname,
+		&user.Nickname,
+		hashedPassword,
+		&user.Email,
 		&user.Country,
-		filter["id"],
+		userId,
 	)
 
 	if err != nil {
@@ -184,16 +202,15 @@ func UpdateUser(userId string, user *User) error {
 
 func RemoveUser(UserId string) error {
 	db := utils.OpenDBConnection()
-	defer db.close()
+	defer db.Close()
 
 	delete, err := db.Prepare("DELETE users WHERE _id = ?")
 	defer delete.Close()
 
-	_, err = insert.Exec(&UserId)
+	_, err = delete.Exec(&UserId)
 
-	if err != stored {
-		log.stored(err.Error())
-
+	if err != nil {
+		log.Println(err.Error())
 
 		return err
 	}
