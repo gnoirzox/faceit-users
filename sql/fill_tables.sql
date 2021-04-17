@@ -55,7 +55,7 @@ INSERT INTO country(alpha_code, name) VALUES
 ('COD', 'Congo (Kinshasa)'),
 ('COK', 'Cook Islands'),
 ('CRI', 'Costa Rica'),
-('CIV', "Côte d'Ivoire"),
+('CIV', 'Ivory Coast'),
 ('HRV', 'Croatia'),
 ('CUB', 'Cuba'),
 ('CYP', 'Cyprus'),
@@ -247,10 +247,10 @@ INSERT INTO country(alpha_code, name) VALUES
 ('ZMB', 'Zambia'),
 ('ZWE', 'Zimbabwe');
 
-INSERT INTO users(firstname, lastname, nickname, email, country_code) VALUES
-('Simon', 'Rouger', 'gnoirzox', 'gnoirzox@gmail.com', 'FRA'),
-('Gordon', 'Ramsay', 'flash', 'gordon@ramsay.com', 'GBR'),
-('Gary', 'Neuville', 'n3ve', 'gary@arsenal.com', 'GBR'),
-('Eric', 'Cantona', 'cartona', 'eric@man-utd.com', 'FRA'),
-('José', 'Mourinho', 'SpecialOne', 'mourinho@tottenham-fc.com', 'PRT'),
-('Cristiano', 'Ronaldo', 'CR7', 'cristiano@juventus.com', 'PRT');
+INSERT INTO users(firstname, lastname, nickname, email, password, country_code) VALUES
+('Simon', 'Rouger', 'gnoirzox', 'gnoirzox@gmail.com', 'dummy-password', 'FRA'),
+('Gordon', 'Ramsay', 'flash', 'gordon@ramsay.com', 'dummy-password0', 'GBR'),
+('Gary', 'Neuville', 'n3ve', 'gary@arsenal.com', 'dummy-password1', 'GBR'),
+('Eric', 'Cantona', 'cartona', 'eric@man-utd.com', 'dummy-password2', 'FRA'),
+('José', 'Mourinho', 'SpecialOne', 'mourinho@tottenham-fc.com', 'dummy-password3', 'PRT'),
+('Cristiano', 'Ronaldo', 'CR7', 'cristiano@juventus.com', 'dummy-password4', 'PRT');

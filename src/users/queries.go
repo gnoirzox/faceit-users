@@ -12,7 +12,7 @@ func RetrieveUser(UserId string) (*User, error) {
 	db := utils.OpenDBConnection()
 	defer db.Close()
 
-	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country FROM users WHERE _id = ?", UserId)
+	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country_code FROM users WHERE _id = ?", UserId)
 
 	var user User
 
@@ -42,10 +42,10 @@ func RetrieveUsers(filters map[string]string) (*list.List, error) {
 	}
 
 	if country, ok := filters["country"]; ok {
-		where += " AND country = " + country
+		where += " AND country_code = " + country
 	}
 
-	queryString := "SELECT firstname, lastname, nickname, email, country FROM users " + where
+	queryString := "SELECT firstname, lastname, nickname, email, country_code FROM users " + where
 
 	rows, err := db.Query(queryString)
 
@@ -85,7 +85,7 @@ func InsertUser(user *User) error {
 	defer db.Close()
 
 	insert, err := db.Prepare(
-		"INSERT INTO users (firstname, lastname, nickname, password, email, country) VALUES (?, ?, ?, ?, ?, ?)",
+		"INSERT INTO users (firstname, lastname, nickname, password, email, country_code) VALUES (?, ?, ?, ?, ?, ?)",
 	)
 	defer insert.Close()
 
@@ -148,7 +148,7 @@ func UpdateUser(userId string, user *User) error {
 	}
 
 	update, err := transaction.Prepare(
-		"UPDATE users SET firstname = ?, lastname = ?, nickname = ?, password = ?, email = ?, country = ? WHERE _id = ?",
+		"UPDATE users SET firstname = ?, lastname = ?, nickname = ?, password = ?, email = ?, country_code = ? WHERE _id = ?",
 	)
 
 	if err != nil {
