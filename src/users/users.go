@@ -25,7 +25,7 @@ func (u *User) IsValidNickname() bool {
 }
 
 func (u *User) IsValidPassword() bool {
-	if len(u.Password) >= 8 {
+	if len(u.Password) <= 8 {
 		log.Println("The User.Password is too short. It should be at least 8 characters.")
 
 		return false

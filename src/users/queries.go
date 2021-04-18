@@ -55,7 +55,7 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 		return nil, err
 	}
 
-	users := make([]User, 1)
+	users := make([]User, 0)
 
 	for rows.Next() {
 		var user User
@@ -204,7 +204,7 @@ func RemoveUser(UserId string) error {
 	db := utils.OpenDBConnection()
 	defer db.Close()
 
-	delete, err := db.Prepare("DELETE users WHERE _id = $1")
+	delete, err := db.Prepare("DELETE FROM users WHERE _id = $1")
 	defer delete.Close()
 
 	_, err = delete.Exec(&UserId)
