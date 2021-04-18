@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"errors"
 	"log"
 	"net/http"
 
@@ -80,26 +81,26 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	utils.ReturnJsonResponse(w, http.StatusOK, users)
 }
 
-func ValidateUser(u *User) (bool, string) {
+func ValidateUser(u *User) (bool, error) {
 	if u.IsValidNickname() != true {
-		errorMessage := "The submitted nickname is not valid. It should have a length between 3 and 12 characters."
+		errorMessage := errors.New("The submitted nickname is not valid. It should have a length between 3 and 12 characters.")
 
 		return false, errorMessage
 	}
 
 	if u.IsValidPassword() != true {
-		errorMessage := "The submitted password is not valid. It should have a length of at least 8 characters."
+		errorMessage := errors.New("The submitted password is not valid. It should have a length of at least 8 characters.")
 
 		return false, errorMessage
 	}
 
 	if u.IsValidEmail() != true {
-		errorMessage := "The submitted Email is not valid."
+		errorMessage := errors.New("The submitted Email is not valid.")
 
 		return false, errorMessage
 	}
 
-	return true, ""
+	return true, nil
 }
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
@@ -124,12 +125,14 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 
 	_, validationError := ValidateUser(&u)
 
-	if validationError != "" {
+	if validationError != nil {
+		log.Println(validationError.Error())
+
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusBadRequest,
 			map[string]string{
-				"error": validationError,
+				"error": validationError.Error(),
 			},
 		)
 		return
@@ -193,12 +196,14 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 
 	_, validationError := ValidateUser(&user)
 
-	if validationError != "" {
+	if validationError != nil {
+		log.Println(validationError.Error())
+
 		utils.ReturnJsonResponse(
 			w,
 			http.StatusBadRequest,
 			map[string]string{
-				"error": validationError,
+				"error": validationError.Error(),
 			},
 		)
 		return

@@ -1,22 +1,22 @@
 package users
 
 import (
-	"container/list"
+	//"container/list"
 	"errors"
 	"log"
 
 	"../utils"
 )
 
-func RetrieveUser(UserId string) (*User, error) {
+func RetrieveUser(userId string) (*User, error) {
 	db := utils.OpenDBConnection()
 	defer db.Close()
 
-	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country_code FROM users WHERE _id = ?", UserId)
+	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country_code FROM users WHERE _id = $1", userId)
 
 	var user User
 
-	err := row.Scan(&user.Firstname, &user.Lastname, &user.Nickname, &user.Email, &user.Country, &UserId)
+	err := row.Scan(&user.Firstname, &user.Lastname, &user.Nickname, &user.Email, &user.Country)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -27,7 +27,7 @@ func RetrieveUser(UserId string) (*User, error) {
 	return &user, nil
 }
 
-func RetrieveUsers(filters map[string]string) (*list.List, error) {
+func RetrieveUsers(filters map[string]string) ([]User, error) {
 	db := utils.OpenDBConnection()
 	defer db.Close()
 
@@ -55,7 +55,7 @@ func RetrieveUsers(filters map[string]string) (*list.List, error) {
 		return nil, err
 	}
 
-	users := list.New()
+	users := make([]User, 1)
 
 	for rows.Next() {
 		var user User
@@ -74,7 +74,7 @@ func RetrieveUsers(filters map[string]string) (*list.List, error) {
 			return nil, err
 		}
 
-		users.PushBack(user)
+		users = append(users, user)
 	}
 
 	return users, nil
@@ -85,7 +85,7 @@ func InsertUser(user *User) error {
 	defer db.Close()
 
 	insert, err := db.Prepare(
-		"INSERT INTO users (firstname, lastname, nickname, password, email, country_code) VALUES (?, ?, ?, ?, ?, ?)",
+		"INSERT INTO users (firstname, lastname, nickname, password, email, country_code) VALUES ($1, $2, $3, $4, $5, $6)",
 	)
 	defer insert.Close()
 
@@ -148,7 +148,7 @@ func UpdateUser(userId string, user *User) error {
 	}
 
 	update, err := transaction.Prepare(
-		"UPDATE users SET firstname = ?, lastname = ?, nickname = ?, password = ?, email = ?, country_code = ? WHERE _id = ?",
+		"UPDATE users SET firstname = $1, lastname = $2, nickname = $3, password = $4, email = $5, country_code = $6 WHERE _id = $7",
 	)
 
 	if err != nil {
@@ -204,7 +204,7 @@ func RemoveUser(UserId string) error {
 	db := utils.OpenDBConnection()
 	defer db.Close()
 
-	delete, err := db.Prepare("DELETE users WHERE _id = ?")
+	delete, err := db.Prepare("DELETE users WHERE _id = $1")
 	defer delete.Close()
 
 	_, err = delete.Exec(&UserId)
