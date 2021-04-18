@@ -11,7 +11,7 @@ import (
 	"os"
 )
 
-func getEnv(key string, defaultValue string) string {
+func GetEnv(key string, defaultValue string) string {
 	value := os.Getenv(key)
 	if len(value) == 0 {
 		return defaultValue
@@ -21,11 +21,11 @@ func getEnv(key string, defaultValue string) string {
 
 func OpenDBConnection() *sql.DB {
 	var (
-		host     = getEnv("DB_HOST", "localhost")
-		port     = getEnv("DB_PORT", "5438")
-		user     = getEnv("DB_USER", "postgres")
-		password = getEnv("DB_PASS", "postgres")
-		dbname   = getEnv("DB_NAME", "postgres")
+		host     = GetEnv("DB_HOST", "localhost")
+		port     = GetEnv("DB_PORT", "5438")
+		user     = GetEnv("DB_USER", "postgres")
+		password = GetEnv("DB_PASS", "postgres")
+		dbname   = GetEnv("DB_NAME", "postgres")
 	)
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",
@@ -33,7 +33,7 @@ func OpenDBConnection() *sql.DB {
 	db, err := sql.Open("postgres", psqlInfo)
 
 	if err != nil {
-		log.Println(err.Error())
+		log.Println("%s: %s", "Failed to connect to Postgres", err)
 	}
 
 	return db

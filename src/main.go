@@ -17,6 +17,10 @@ func main() {
 	router.HandleFunc("/user/{id}", users.DeleteUser).Methods("DELETE")
 	router.HandleFunc("/user/{id}", users.GetUser).Methods("GET")
 	router.HandleFunc("/users", users.GetUsers).Methods("GET")
+	router.Path("/users").
+		Queries("nickname", "{nickname}", "email", "{email}", "country", "{country}").
+		HandlerFunc(users.GetUsers).
+		Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8888", router))
 }

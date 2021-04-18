@@ -8,6 +8,7 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"../events"
 	"../utils"
 )
 
@@ -46,21 +47,20 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
 	filters := make(map[string]string)
 
-	if nickname, ok := vars["nickname"]; ok {
-		filters["nickname"] = nickname
+	if r.FormValue("nickname") != "" {
+		filters["nickname"] = r.FormValue("nickname")
 
 	}
 
-	if email, ok := vars["email"]; ok {
-		filters["email"] = email
+	if r.FormValue("email") != "" {
+		filters["email"] = r.FormValue("email")
 
 	}
 
-	if country, ok := vars["country"]; ok {
-		filters["country"] = country
+	if r.FormValue("country") != "" {
+		filters["country"] = r.FormValue("country")
 
 	}
 
@@ -152,10 +152,24 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statusMessage := "The user has successfully been created"
+
+	err = events.PublishMessage(
+		"CreatedUser",
+		map[string]string{
+			"status":       statusMessage,
+			"userNickname": string(u.Nickname),
+		},
+	)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	utils.ReturnJsonResponse(
 		w,
 		http.StatusOK,
-		map[string]string{"status": "The user has successfully been created"},
+		map[string]string{"status": statusMessage},
 	)
 }
 
@@ -223,10 +237,24 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statusMessage := "The user has successfully been updated"
+
+	err = events.PublishMessage(
+		"UpdatedUser",
+		map[string]string{
+			"status": statusMessage,
+			"userId": userId,
+		},
+	)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	utils.ReturnJsonResponse(
 		w,
 		http.StatusOK,
-		map[string]string{"status": "The user has successfully been updated"},
+		map[string]string{"status": statusMessage},
 	)
 }
 
@@ -261,9 +289,23 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	statusMessage := "The provided user has been successfully deleted."
+
+	err = events.PublishMessage(
+		"DeletedUser",
+		map[string]string{
+			"status": statusMessage,
+			"userId": userId,
+		},
+	)
+
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	utils.ReturnJsonResponse(
 		w,
 		http.StatusOK,
-		map[string]string{"status": "The provided user has been successfully deleted."},
+		map[string]string{"status": statusMessage},
 	)
 }

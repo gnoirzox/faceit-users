@@ -1,9 +1,10 @@
 package users
 
 import (
-	//"container/list"
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 
 	"../utils"
 )
@@ -34,18 +35,21 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 	where := "WHERE 1=1"
 
 	if nickname, ok := filters["nickname"]; ok {
-		where += " AND nickname = " + nickname
+		where += fmt.Sprintf(" AND nickname = '%s'", strings.Replace(nickname, "'", "", -1))
 	}
 
 	if email, ok := filters["email"]; ok {
-		where += " AND email = " + email
+		where += fmt.Sprintf(" AND email = '%s'", strings.Replace(email, "'", "", -1))
 	}
 
 	if country, ok := filters["country"]; ok {
-		where += " AND country_code = " + country
+		where += fmt.Sprintf(" AND country_code = '%s'", strings.Replace(country, "'", "", -1))
 	}
 
+	// TODO: improve it to avoid more clever SQL injections.. This is temporary!
 	queryString := "SELECT firstname, lastname, nickname, email, country_code FROM users " + where
+
+	log.Println(queryString)
 
 	rows, err := db.Query(queryString)
 
