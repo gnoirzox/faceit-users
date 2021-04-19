@@ -6,7 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"./users"
+	"github.com/gnoirzox/faceit-users/users"
 )
 
 func main() {

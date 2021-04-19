@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	"../utils"
+	"github.com/gnoirzox/faceit-users/utils"
 )
 
 func RetrieveUser(userId string) (*User, error) {
@@ -60,8 +60,6 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 
 	// TODO: improve it to avoid more clever SQL injections.. This is temporary!
 	queryString := "SELECT firstname, lastname, nickname, email, country_code FROM users " + where
-
-	log.Println(queryString)
 
 	rows, err := db.Query(queryString)
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"log"
 
-	"../utils"
+	"github.com/gnoirzox/faceit-users/utils"
 
 	"github.com/streadway/amqp"
 )

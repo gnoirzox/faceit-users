@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"../events"
-	"../utils"
+	"github.com/gnoirzox/faceit-users/events"
+	"github.com/gnoirzox/faceit-users/utils"
 )
 
 func DBHealthCheck(w http.ResponseWriter, r *http.Request) {

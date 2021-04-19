@@ -1,8 +1,8 @@
 package users
 
 import (
-	"../utils"
 	"database/sql"
+	"github.com/gnoirzox/faceit-users/utils"
 	"log"
 )
 
