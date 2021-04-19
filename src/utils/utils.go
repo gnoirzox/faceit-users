@@ -19,7 +19,7 @@ func GetEnv(key string, defaultValue string) string {
 	return value
 }
 
-func OpenDBConnection() *sql.DB {
+func OpenDBConnection() (*sql.DB, error) {
 	var (
 		host     = GetEnv("DB_HOST", "localhost")
 		port     = GetEnv("DB_PORT", "5438")
@@ -34,9 +34,11 @@ func OpenDBConnection() *sql.DB {
 
 	if err != nil {
 		log.Println("%s: %s", "Failed to connect to Postgres", err)
+
+		return nil, err
 	}
 
-	return db
+	return db, nil
 }
 
 func ReturnJsonResponse(w http.ResponseWriter, httpCode int, payload interface{}) {

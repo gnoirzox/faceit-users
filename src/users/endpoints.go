@@ -12,6 +12,78 @@ import (
 	"../utils"
 )
 
+func DBHealthCheck(w http.ResponseWriter, r *http.Request) {
+	db, err := utils.OpenDBConnection()
+	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Could not connect to the database."},
+		)
+
+		return
+	}
+
+	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
+}
+
+func MQHealthCheck(w http.ResponseWriter, r *http.Request) {
+	mq, err := events.OpenRabbitMQConnection()
+	defer mq.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to RabbitMQ", err)
+
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Could not connect to the message-broker."},
+		)
+
+		return
+	}
+
+	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
+}
+
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	db, err := utils.OpenDBConnection()
+	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Could not connect to the database."},
+		)
+
+		return
+	}
+
+	mq, err := events.OpenRabbitMQConnection()
+	defer mq.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to RabbitMQ", err)
+
+		utils.ReturnJsonResponse(
+			w,
+			http.StatusBadRequest,
+			map[string]string{"error": "Could not connect to the message-broker."},
+		)
+
+		return
+	}
+
+	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
+}
+
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 

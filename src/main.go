@@ -12,6 +12,10 @@ import (
 func main() {
 	router := mux.NewRouter()
 
+	router.HandleFunc("/health", users.HealthCheck).Methods("GET")
+	router.HandleFunc("/db_health", users.DBHealthCheck).Methods("GET")
+	router.HandleFunc("/notifications_health", users.MQHealthCheck).Methods("GET")
+
 	router.HandleFunc("/user", users.PostUser).Methods("POST")
 	router.HandleFunc("/user/{id}", users.PutUser).Methods("PUT")
 	router.HandleFunc("/user/{id}", users.DeleteUser).Methods("DELETE")

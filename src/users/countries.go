@@ -18,14 +18,21 @@ func (c *Country) IsValidCountry() bool {
 		return false
 	}
 
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return false
+	}
+
 	defer db.Close()
 
 	row := db.QueryRow("SELECT alpha_code, name FROM country WHERE alpha_code = ?", c.IsoAlphaCode)
 
 	var country Country
 
-	err := row.Scan(&country.IsoAlphaCode, &country.Name)
+	err = row.Scan(&country.IsoAlphaCode, &country.Name)
 
 	switch err {
 	case sql.ErrNoRows:

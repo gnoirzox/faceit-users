@@ -10,14 +10,20 @@ import (
 )
 
 func RetrieveUser(userId string) (*User, error) {
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
 	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return nil, err
+	}
 
 	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country_code FROM users WHERE _id = $1", userId)
 
 	var user User
 
-	err := row.Scan(&user.Firstname, &user.Lastname, &user.Nickname, &user.Email, &user.Country)
+	err = row.Scan(&user.Firstname, &user.Lastname, &user.Nickname, &user.Email, &user.Country)
 
 	if err != nil {
 		log.Println(err.Error())
@@ -29,8 +35,14 @@ func RetrieveUser(userId string) (*User, error) {
 }
 
 func RetrieveUsers(filters map[string]string) ([]User, error) {
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
 	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return nil, err
+	}
 
 	where := "WHERE 1=1"
 
@@ -85,8 +97,14 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 }
 
 func InsertUser(user *User) error {
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
 	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return err
+	}
 
 	insert, err := db.Prepare(
 		"INSERT INTO users (firstname, lastname, nickname, password, email, country_code) VALUES ($1, $2, $3, $4, $5, $6)",
@@ -126,7 +144,13 @@ func InsertUser(user *User) error {
 }
 
 func UpdateUser(userId string, user *User) error {
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return err
+	}
 
 	transaction, err := db.Begin()
 	defer transaction.Rollback()
@@ -205,8 +229,14 @@ func UpdateUser(userId string, user *User) error {
 }
 
 func RemoveUser(UserId string) error {
-	db := utils.OpenDBConnection()
+	db, err := utils.OpenDBConnection()
 	defer db.Close()
+
+	if err != nil {
+		log.Println("%s: %s", "Could not connect to the database", err)
+
+		return err
+	}
 
 	delete, err := db.Prepare("DELETE FROM users WHERE _id = $1")
 	defer delete.Close()
