@@ -6,12 +6,12 @@ WORKDIR /src
 
 COPY . /src
 
-RUN go mod download
+#RUN go mod download
 
 RUN cd src/; go build -o faceit-users
 
 FROM alpine AS runtime
 
-COPY --from=build /src/faceit-users /app/faceit-users
+COPY src/faceit-users /app/faceit-users
 
-CMD [ "/app/faceit-users" ]
+CMD ["/app/faceit-users"]
