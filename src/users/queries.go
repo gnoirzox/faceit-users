@@ -14,7 +14,7 @@ func RetrieveUser(userId string) (*User, error) {
 	defer db.Close()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err.Error())
 
 		return nil, err
 	}
@@ -39,7 +39,7 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 	defer db.Close()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err.Error())
 
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 		where += fmt.Sprintf(" AND country_code = '%s'", strings.Replace(country, "'", "", -1))
 	}
 
-	// TODO: need to improve it to avoid more clever SQL injections..
+	// need to improve it to avoid more clever SQL injections..
 	queryString := "SELECT firstname, lastname, nickname, email, country.name AS country FROM users INNER JOIN country ON users.country_code = country.alpha_code " + where
 
 	rows, err := db.Query(queryString)
@@ -99,7 +99,7 @@ func InsertUser(user *User) error {
 	defer db.Close()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err.Error())
 
 		return err
 	}
@@ -145,7 +145,7 @@ func UpdateUser(userId string, user *User) error {
 	db, err := utils.OpenDBConnection()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err.Error())
 
 		return err
 	}
@@ -231,7 +231,7 @@ func RemoveUser(UserId string) error {
 	defer db.Close()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err.Error())
 
 		return err
 	}

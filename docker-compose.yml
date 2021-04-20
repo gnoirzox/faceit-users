@@ -17,6 +17,7 @@ services:
           - ./postgres-data:/var/lib/postgresql/data
           # copy the sql script to create tables
           - ./sql/create_tables.sql:/docker-entrypoint-initdb.d/create_tables.sql
+          # copy the sql script to fill tables
           - ./sql/fill_tables.sql:/docker-entrypoint-initdb.d/fill_tables.sql
     rabbitmq:
         image: rabbitmq:3-management-alpine
@@ -37,6 +38,9 @@ services:
             #image: faceit-users:latest
             #container_name: 'faceit-users'
             #restart: always
+            #depends_on:
+            #-postgres
+            #-rabbitmq
             #ports:
             #- '8888:8888'
 

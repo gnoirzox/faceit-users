@@ -25,7 +25,7 @@ func (c *Country) IsValidCountry() (bool, error) {
 	db, err := utils.OpenDBConnection()
 
 	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
+		log.Printf("%s: %s", "Could not connect to the database", err)
 
 		return false, err
 	}
