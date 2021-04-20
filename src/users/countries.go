@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/gnoirzox/faceit-users/utils"
 	"log"
+	"strings"
 )
 
 type Country struct {
@@ -32,8 +33,10 @@ func (c *Country) IsValidCountry() (bool, error) {
 
 	defer db.Close()
 
-	row := db.QueryRow("SELECT alpha_code, name FROM country WHERE alpha_code = $1", c.IsoAlphaCode)
-	log.Println(row)
+	row := db.QueryRow(
+		"SELECT alpha_code, name FROM country WHERE alpha_code = $1",
+		strings.ToUpper(c.IsoAlphaCode),
+	)
 
 	var country Country
 
