@@ -19,7 +19,7 @@ func RetrieveUser(userId string) (*User, error) {
 		return nil, err
 	}
 
-	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country_code FROM users WHERE _id = $1", userId)
+	row := db.QueryRow("SELECT firstname, lastname, nickname, email, country.name AS country FROM users INNER JOIN country ON users.country_code = country.alpha_code WHERE _id = $1", userId)
 
 	var user User
 
@@ -58,8 +58,8 @@ func RetrieveUsers(filters map[string]string) ([]User, error) {
 		where += fmt.Sprintf(" AND country_code = '%s'", strings.Replace(country, "'", "", -1))
 	}
 
-	// TODO: improve it to avoid more clever SQL injections.. This is temporary!
-	queryString := "SELECT firstname, lastname, nickname, email, country_code FROM users " + where
+	// TODO: need to improve it to avoid more clever SQL injections..
+	queryString := "SELECT firstname, lastname, nickname, email, country.name AS country FROM users INNER JOIN country ON users.country_code = country.alpha_code " + where
 
 	rows, err := db.Query(queryString)
 

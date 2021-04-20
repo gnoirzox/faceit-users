@@ -6,15 +6,16 @@ import (
 
 	"github.com/gorilla/mux"
 
+	"github.com/gnoirzox/faceit-users/health"
 	"github.com/gnoirzox/faceit-users/users"
 )
 
 func main() {
 	router := mux.NewRouter()
 
-	router.HandleFunc("/health", users.HealthCheck).Methods("GET")
-	router.HandleFunc("/db_health", users.DBHealthCheck).Methods("GET")
-	router.HandleFunc("/notifications_health", users.MQHealthCheck).Methods("GET")
+	router.HandleFunc("/health", health.HealthCheck).Methods("GET")
+	router.HandleFunc("/db_health", health.DBHealthCheck).Methods("GET")
+	router.HandleFunc("/notifications_health", health.MQHealthCheck).Methods("GET")
 
 	router.HandleFunc("/user", users.PostUser).Methods("POST")
 	router.HandleFunc("/user/{id}", users.PutUser).Methods("PUT")

@@ -12,78 +12,6 @@ import (
 	"github.com/gnoirzox/faceit-users/utils"
 )
 
-func DBHealthCheck(w http.ResponseWriter, r *http.Request) {
-	db, err := utils.OpenDBConnection()
-	defer db.Close()
-
-	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
-
-		utils.ReturnJsonResponse(
-			w,
-			http.StatusBadRequest,
-			map[string]string{"error": "Could not connect to the database."},
-		)
-
-		return
-	}
-
-	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
-}
-
-func MQHealthCheck(w http.ResponseWriter, r *http.Request) {
-	mq, err := events.OpenRabbitMQConnection()
-	defer mq.Close()
-
-	if err != nil {
-		log.Println("%s: %s", "Could not connect to RabbitMQ", err)
-
-		utils.ReturnJsonResponse(
-			w,
-			http.StatusBadRequest,
-			map[string]string{"error": "Could not connect to the message-broker."},
-		)
-
-		return
-	}
-
-	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
-}
-
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	db, err := utils.OpenDBConnection()
-	defer db.Close()
-
-	if err != nil {
-		log.Println("%s: %s", "Could not connect to the database", err)
-
-		utils.ReturnJsonResponse(
-			w,
-			http.StatusBadRequest,
-			map[string]string{"error": "Could not connect to the database."},
-		)
-
-		return
-	}
-
-	mq, err := events.OpenRabbitMQConnection()
-	defer mq.Close()
-
-	if err != nil {
-		log.Println("%s: %s", "Could not connect to RabbitMQ", err)
-
-		utils.ReturnJsonResponse(
-			w,
-			http.StatusBadRequest,
-			map[string]string{"error": "Could not connect to the message-broker."},
-		)
-
-		return
-	}
-
-	utils.ReturnJsonResponse(w, http.StatusOK, map[string]string{"status": "OK"})
-}
-
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 
@@ -170,6 +98,18 @@ func ValidateUser(u *User) (bool, error) {
 		errorMessage := errors.New("The submitted Email is not valid.")
 
 		return false, errorMessage
+	}
+
+	country := new(Country)
+	country.IsoAlphaCode = u.Country
+
+	_, countryError := country.IsValidCountry()
+
+	if countryError != nil {
+		countryError := errors.New("The submitted Country code for this user is invalid. Please use an ISO 3 characters code")
+		log.Println(countryError.Error())
+
+		return false, countryError
 	}
 
 	return true, nil
