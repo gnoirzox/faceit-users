@@ -63,6 +63,8 @@ I could also have decided to use a NoSQL database, but I though the use of a SQL
 
 Regarding the User validation, I assumed that we want the password to be of at least 8 characters, also we want to check the email validity and the nickname length (between 3 and 12 characters). Regarding the country, I assumed it was better to retrict its usage with 3 characters long ISO alpha codes so we can check its validity directly in the database against the list of valid countries.
 
+For security purpose, I assumed that the User password needs to be hashed in the Database, to do so I decided to use the `crypto/bcrypt` package because it appears to be the goto method for password hashing as it is very secure.
+
 For the notifications system, I assumed a Message Broker was a good solution because AMQP is a good protocole for the Pub/Sub pattern, so I decided to use RabbitMQ with 3 different queues, one for each event type (insert, update and delete). I could also have used a streaming system like Kafka.
 
 
