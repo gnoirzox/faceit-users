@@ -50,6 +50,15 @@ In order to delete an existing user:
 With `<user-id>` being the user primary key retrieved from the SQL database.
 
 
+### Health Check endpoints
+
+I added health check endpoints for the Database (PostgreSQL) and Message Broker (RabbitMQ) dependencies with the following endpoints:
+
+* `/health`: checks the status of both the Database and the Message Broker;
+* `/db_health`: checks the status of the Database;
+* `/notifications_health`: checks the status of the Message Broker.
+
+
 ### Check notification event messages from the Message Broker (RabbitMQ)
 
 If you want to check the produced messages in the different queues for each event type, you can access it locally within your browser with the following address: `http://localhost:15672`
