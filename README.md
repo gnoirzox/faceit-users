@@ -74,7 +74,7 @@ The areas of improvements of this projects for deployment within a production en
 
 * Add tests against endpoints and SQL queries using either integration tests or mocks.
 * Fix the Dockerfile in order to deploy it and also run the tests within a CI/CD pipeline.
-* Add metrics for telemetry purpose (eg. use of Prometheus with Grafana dashboard).
+* Add metrics for monitoring purpose (eg. use of Prometheus with Grafana dashboard).
 * Use of concurrency patterns on SQL queries and AMQP events.
 * Improve the `/users` filters SQL query to prevent more clever SQL injection attacks.
 
